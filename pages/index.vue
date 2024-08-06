@@ -99,7 +99,7 @@ async function delegateToken(e) {
 </script>
 
 <template>
-	<div class="mt-5 container">
+	<div class="mt-5 container main-content">
 		<h1 class="text-center mb-4">Homework Session 2 - Token Management Dashboard</h1>
 		<div class="text-muted small text-center" role="alert">
 			Please ensure you are connected to Devnet.
@@ -397,5 +397,6 @@ async function delegateToken(e) {
 <style scoped lang="sass">
 a
 	color: #1b8e00
-
+main-content
+	padding-bottom: 100px
 </style>
