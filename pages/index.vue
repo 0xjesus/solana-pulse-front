@@ -49,7 +49,7 @@ async function delegateToken(e) {
 
 <template>
   <div class="container mt-5">
-    <h1 class="text-center mb-4">Token Management Dashboard</h1>
+    <h1 class="text-center mb-4">HomeWork Session 2 - Token Management Dashboard</h1>
 
     <!-- Token Creation Section -->
     <div class="card mb-4">
