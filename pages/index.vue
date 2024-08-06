@@ -21,11 +21,11 @@ const delegateMintAddress = ref('G1be5CqZUb4UudNTZWXKvSQ6dkfwLxGXUDcjx8VEtaZm');
 const delegateAmount = ref(30);
 const messageTxResult = ref('');
 const txLoading = ref({
-	createToken: false,
-	mintToken: false,
-	transferToken: false,
-	burnToken: false,
-	delegateToken: false,
+	createToken:false,
+	mintToken:false,
+	transferToken:false,
+	burnToken:false,
+	delegateToken:false,
 
 });
 
@@ -61,7 +61,7 @@ async function mintToken(e) {
 }
 
 async function transferToken(e) {
-	try{
+	try {
 		e.preventDefault();
 		loadingAndMessageFunction('transferToken');
 		messageTxResult.value = await solanaStore.transferToken(transferFrom.value,transferTo.value,transferMintAddress.value,transferAmount.value);
@@ -73,7 +73,7 @@ async function transferToken(e) {
 }
 
 async function burnToken(e) {
-	try{
+	try {
 		e.preventDefault();
 		loadingAndMessageFunction('burnToken');
 		messageTxResult.value = await solanaStore.burnToken(burnAddress.value,burnMintAddress.value,burnAmount.value);
@@ -85,7 +85,7 @@ async function burnToken(e) {
 }
 
 async function delegateToken(e) {
-	try{
+	try {
 		e.preventDefault();
 		loadingAndMessageFunction('delegateToken');
 		console.log(delegateFrom.value,delegateTo.value,delegateMintAddress.value,delegateAmount.value);
@@ -100,7 +100,18 @@ async function delegateToken(e) {
 
 <template>
 	<div class="mt-5 container">
-		<h1 class="text-center mb-4">HomeWork Session 2 - Token Management Dashboard</h1>
+		<h1 class="text-center mb-4">Homework Session 2 - Token Management Dashboard</h1>
+		<div class="text-muted small text-center" role="alert">
+			Please ensure you are connected to Devnet.
+		</div>
+		<div class="d-flex justify-content-center mb-4">
+			<a href="https://github.com/0xjesus/solana-pulse-front" target="_blank" class="btn btn-link me-2">
+				Frontend Repository
+			</a>
+			<a href="https://github.com/0xjesus/solana-pulse-api" target="_blank" class="btn btn-link">
+				Backend Repository
+			</a>
+		</div>
 		<!-- Here create a section with pre and alert type info to show the resultTX -->
 		<div v-if="messageTxResult?.tx" class="alert alert-success small" role="alert">
 			<div>Transaction submitted successfully.</div>

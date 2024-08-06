@@ -11,7 +11,8 @@
         />
         Solana Summer Camp
       </a>
-			  <span class="badge bg-warning text-dark">Devnet</span>
+			<span class="badge bg-warning text-dark me-2">Devnet</span>
+			<span class="badge bg-success">0xJesus</span>
       <button
         class="navbar-toggler"
         type="button"
