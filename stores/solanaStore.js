@@ -5,7 +5,8 @@ import {useWallet} from "solana-wallets-vue";
 export const useSolanaStore = defineStore('solanaStore',() => {
 
 	const wallet = ref('');
-
+	const apiUrl = useRuntimeConfig().public.baseURL;
+	console.log('apiUrl:',apiUrl);
 	const connectedWallet = computed(() => wallet.wallet.value?.adapter?.name);
 
 	const signEncodedTransaction = async (encodedTransaction) => {
@@ -48,7 +49,6 @@ export const useSolanaStore = defineStore('solanaStore',() => {
 			transaction = Transaction.from(Buffer.from(encodedTransaction,'base64'));
 		} catch (error) {
 			console.error('Failed to parse transaction:',error);
-			alert('Invalid transaction');
 			return;
 		}
 
@@ -61,82 +61,156 @@ export const useSolanaStore = defineStore('solanaStore',() => {
 			});
 
 			await connection.confirmTransaction(txid,'confirmed');
-			alert(`https://solscan.io/tx/${txid}?cluster=devnet`);
-			return txid;
+			return `https://solscan.io/tx/${txid}?cluster=devnet`
 		} catch (error) {
-			console.error('Transaction signing failed:',error);
-			alert('Transaction signing failed', error);
-			return;
+			console.error('Error signing transaction:',error);
+			throw error
 		}
 	}
 
-	const callApi = async (action,params) => {
-		const {data,error} = await useFetch('/api/token',{
-			method:'POST',
-			body:{action,params},
-		});
-
-		if (error.value) {
-			throw createError({statusCode:500,statusMessage:error.value.message});
-		}
-
-		return data.value;
-	};
-
 	const createToken = async (name,symbol,decimals) => {
-		const params = {payer:wallet.value,name,symbol,decimals};
-		const {transaction} = await callApi('create',params);
-		return await signEncodedTransaction(transaction);
+		try {
+			const params = {payer:wallet.value,name,symbol,decimals};
+			const res = await fetch(`${apiUrl}/solana/create-token`,{
+				method:'POST',
+				headers:{'Content-Type':'application/json'},
+				body:JSON.stringify(params),
+			});
+
+			if (!res.ok) {
+				alert('Failed to create token');
+				return;
+			}
+			const resData = await res.json()
+			console.log('resData:',resData);
+			const tx = await signEncodedTransaction(resData.data.encodedTransaction);
+			return {
+				tx,
+				mintPublicKey:resData.data.mintPublicKey,
+			};
+		} catch (e) {
+			console.error('Error creating token:',e);
+			throw e;
+		}
 	};
 
 	const mintToken = async (mintAddress,recipientAddress,amount) => {
-		const params = {
-			payer:wallet.value,
-			mintAddress,
-			recipientAddress,
-			amount,
-		};
-		const {transaction} = await callApi('mint',params);
-		const tx = transaction instanceof Transaction ? transaction : Transaction.from(transaction.data);
-		return await signEncodedTransaction(tx);
+		try {
+			const params = {
+				payer:wallet.value,
+				mintAddress,
+				recipientAddress,
+				amount,
+			};
+			const res = await fetch(`${apiUrl}/solana/mint-token`,{
+				method:'POST',
+				headers:{'Content-Type':'application/json'},
+				body:JSON.stringify(params),
+			});
+
+			if (!res.ok) {
+				alert('Failed to mint token',await res.text());
+				return;
+			}
+
+			const resData = await res.json();
+			console.log('resData:',resData);
+			const tx = await signEncodedTransaction(resData.data.encodedTransaction);
+			return {tx};
+
+		} catch (e) {
+			console.error('Error minting token:',e);
+			throw e;
+		}
 	};
 
 	const transferToken = async (fromAddress,toAddress,mintAddress,amount) => {
-		const params = {
-			payer:wallet.value,
-			fromAddress,
-			toAddress,
-			mintAddress,
-			amount,
-		};
-		const {transaction} = await callApi('transfer',params);
-		const tx = transaction instanceof Transaction ? transaction : Transaction.from(transaction.data);
-		return await signEncodedTransaction(tx);
+		try {
+			const params = {
+				payer:wallet.value,
+				fromAddress,
+				toAddress,
+				mintAddress,
+				amount,
+			};
+			const res = await fetch(`${apiUrl}/solana/transfer-token`,{
+				method:'POST',
+				headers:{'Content-Type':'application/json'},
+				body:JSON.stringify(params),
+			});
+
+			if (!res.ok) {
+				alert('Failed to transfer token',await res.text());
+				return;
+			}
+
+			const resData = await res.json();
+
+			const tx = await signEncodedTransaction(resData.data.encodedTransaction);
+
+			return {tx};
+		} catch (e) {
+			console.error('Error transferring token:',e);
+			throw e
+		}
 	};
 
 	const burnToken = async (accountAddress,mintAddress,amount) => {
-		const params = {
-			payer:wallet.value,
-			accountAddress,
-			mintAddress,
-			amount,
-		};
-		const {transaction} = await callApi('burn',params);
-		const tx = transaction instanceof Transaction ? transaction : Transaction.from(transaction.data);
-		return await signEncodedTransaction(tx);
+		try {
+			const params = {
+				payer:wallet.value,
+				accountAddress,
+				mintAddress,
+				amount,
+			};
+			const res = await fetch(`${apiUrl}/solana/burn-token`,{
+				method:'POST',
+				headers:{'Content-Type':'application/json'},
+				body:JSON.stringify(params),
+			});
+
+			if (!res.ok) {
+				alert('Failed to burn token',await res.text());
+				return;
+			}
+
+			const resData = await res.json();
+			const tx = await signEncodedTransaction(resData.data.encodedTransaction);
+			return {tx};
+		} catch (e) {
+			throw e;
+		}
+
 	};
 
 	const delegateToken = async (ownerAddress,delegateAddress,mintAddress,amount) => {
-		const params = {
-			payer:wallet.value,
-			ownerAddress,
-			delegateAddress,
-			mintAddress,
-			amount,
-		};
-		const {transaction} = await callApi('delegate',params);
-		const tx = transaction instanceof Transaction ? transaction : Transaction.from(transaction.data);
-		return await signEncodedTransaction(tx);
+		try {
+			const params = {
+				payer:wallet.value,
+				ownerAddress,
+				delegateAddress,
+				mintAddress,
+				amount,
+			};
+			const res = await fetch(`${apiUrl}/solana/delegate-token`,{
+				method:'POST',
+				headers:{'Content-Type':'application/json'},
+				body:JSON.stringify(params),
+			});
+
+			if (!res.ok) {
+				alert('Failed to delegate token',await res.text());
+				return;
+			}
+
+			const resData = await res.json();
+			const tx = await signEncodedTransaction(resData.data.encodedTransaction);
+			return {tx};
+		} catch (e) {
+			console.error('Error delegating token:',e);
+			throw e;
+		}
+
 	};
 
 	return {
