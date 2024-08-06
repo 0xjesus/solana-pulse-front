@@ -1,0 +1,19 @@
+/*Variables
+--------------------------------------------------------------------------------------------------------------------- */
+@import "base.variables";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "globals";
+@import "plugins";
+
+
+
+$brand-colors: (
+	//"primary": $primary,
+	//"secondary": $secondary
+);
+
+$theme-colors: map-merge($theme-colors, $brand-colors);
+
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap.modifications";
